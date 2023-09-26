@@ -3,14 +3,15 @@ name: MSBuild
 on:
   push:
     branches: ["master"]
-  pull_request:
+  pull_request_target:
     branches: ["master"]
+    types: [closed]
   workflow_dispatch:
 
 env:
   SOLUTION_FILE_PATH: .
   APPX_CERTIFICATE_PASSWORD: ${{ secrets.APPX_CERTIFICATE_PASSWORD }}
-  GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
+  ACTION_TOKEN: ${{ secrets.ACTION_TOKEN }}
 
 permissions:
   contents: read
@@ -45,7 +46,7 @@ jobs:
           GITHUB_ENV: ${{ env.GITHUB_ENV }}
 
       - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v1.1
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -79,15 +80,16 @@ jobs:
         working-directory: ${{ env.GITHUB_WORKSPACE }}
         run: python build.py --target=build --config=release --platform=${{ matrix.arch }}
 
-      # - name: print file
-      #   run: tree AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test
+      # - name: ls file
+      #   run: ls AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test
 
-      # - name: Upload file to release
-      #   uses: "marvinpinto/action-automatic-releases@latest"
-      #   with:
-      #     repo_token: "${{ env.GITHUB_TOKEN }}"
-      #     automatic_release_tag: "v${{ env.VERSION }}-${{ matrix.arch }}"
-      #     prerelease: true
-      #     title: "V${{ env.VERSION }}-${{ matrix.arch }}"
-      #     files: |
-      #       version.txt
+      - name: Upload file to release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ env.ACTION_TOKEN }}"
+          automatic_release_tag: "v${{ env.VERSION }}-${{ matrix.arch }}"
+          prerelease: true
+          title: "V${{ env.VERSION }}-${{ matrix.arch }}"
+          files: |
+            AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test/deepinWSL-Appx_${{ env.VERSION }}_${{ matrix.arch }}.cer
+            AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test/deepinWSL-Appx_${{ env.VERSION }}_${{ matrix.arch }}.appxbundle
