@@ -53,11 +53,24 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: set arch # multistrap 使用的 arch 变量是 amd64、arm64，对 matrix.arch 进行判断设置 arch 变量
+        run: |
+          if [ "${{ matrix.arch }}" == "x64" ]; then
+            echo "arch=amd64" >> $GITHUB_ENV
+            echo "wsldl_name=wsldl" >> $GITHUB_ENV
+          elif [ "${{ matrix.arch }}" == "arm64" ]; then
+            echo "arch=arm64" >> $GITHUB_ENV
+            echo "wsldl_name=wsldl_arm64" >> $GITHUB_ENV
+          fi
+        shell: bash
+        env:
+          GITHUB_ENV: ${{ env.GITHUB_ENV }}
+
       - uses: suisei-cn/actions-download-file@v1.4.0
         id: downloadfile
         name: Download rootfs
         with:
-          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}-${{ matrix.arch }}/deepin-rootfs-${{ matrix.arch }}.tar.gz
+          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}-${{ env.arch }}/deepin-rootfs-${{ env.arch }}.tar.gz
           target: ${{ matrix.arch }}
           filename: deepin-rootfs.tar.gz
 
@@ -80,8 +93,12 @@ jobs:
         working-directory: ${{ env.GITHUB_WORKSPACE }}
         run: python build.py --target=build --config=release --platform=${{ matrix.arch }}
 
-      # - name: ls file
-      #   run: ls AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test
+      - name: Download wsl.exe file from wsldl project
+        run: curl -L -o deepin.exe https://github.com/yuk7/wsldl/releases/download/23072600/${{ env.wsldl_name }}.exe
+
+      - name: Zip deepin.tar.gz and deepin.exe
+        run: Compress-Archive -Path ${{ matrix.arch }}/deepin-rootfs.tar.gz, deepin.exe -Destination deepinWSL-wsldl.zip
+        shell: powershell
 
       - name: Upload file to release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -93,3 +110,4 @@ jobs:
           files: |
             AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test/deepinWSL-Appx_${{ env.VERSION }}_${{ matrix.arch }}.cer
             AppPackages/deepinWSL-Appx/deepinWSL-Appx_${{ env.VERSION }}_Test/deepinWSL-Appx_${{ env.VERSION }}_${{ matrix.arch }}.appxbundle
+            deepinWSL-wsldl.zip
