@@ -53,7 +53,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: set arch # multistrap 使用的 arch 变量是 amd64、arm64，对 matrix.arch 进行判断设置 arch 变量
+      - name: set arch # deepin-rootfs 使用的 arch 变量是 amd64、arm64，对 matrix.arch 进行判断设置 arch 变量
         run: |
           if [ "${{ matrix.arch }}" == "x64" ]; then
             echo "arch=amd64" >> $GITHUB_ENV
@@ -70,7 +70,7 @@ jobs:
         id: downloadfile
         name: Download rootfs
         with:
-          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}-${{ env.arch }}/deepin-rootfs-${{ env.arch }}.tar.gz
+          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}/deepin-rootfs-${{ env.arch }}.tar.gz
           target: ${{ matrix.arch }}
           filename: deepin-rootfs.tar.gz
 
