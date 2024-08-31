@@ -70,7 +70,7 @@ jobs:
         id: downloadfile
         name: Download rootfs
         with:
-          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}/deepin-rootfs-${{ env.arch }}.tar.gz
+          url: https://github.com/deepin-community/deepin-rootfs/releases/download/v${{ env.ROOTFS_VERSION }}/deepin-wsl-rootfs-${{ env.arch }}.tar.gz
           target: ${{ matrix.arch }}
           filename: deepin-rootfs.tar.gz
 
