@@ -1,12 +1,12 @@
 name: MSBuild
 
-on:
-  push:
-    branches: ["master"]
-  pull_request_target:
-    branches: ["master"]
-    types: [closed]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: ["master"]
+#   pull_request_target:
+#     branches: ["master"]
+#     types: [closed]
+#   workflow_dispatch:
 
 env:
   SOLUTION_FILE_PATH: .

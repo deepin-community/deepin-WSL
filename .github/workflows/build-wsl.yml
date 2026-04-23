@@ -1,0 +1,54 @@
+name: build WSL
+
+on:
+  push:
+    branches: [ 'master' ]
+    paths:
+      - 'config/**'
+      - 'resources'
+      - 'build.sh'
+  pull_request:
+    branches: [ 'master' ]
+    paths:
+      - 'config/**'
+      - 'resources'
+      - 'build.sh'
+  workflow_dispatch:
+
+env:
+  ACTION_TOKEN: ${{ secrets.ACTION_TOKEN }}
+
+jobs:
+  build:
+    name: Build deepin WSL
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+
+      - name: Read Rootfs version
+        run: |
+          echo "VERSION=$(curl -s https://raw.githubusercontent.com/deepin-community/deepin-rootfs/master/version.txt | cat)" >> $GITHUB_ENV
+        shell: bash
+        env:
+          GITHUB_ENV: ${{ env.GITHUB_ENV }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build WSL
+        run: |
+          sudo bash build.sh amd64 "v${{ env.VERSION }}"
+          sudo bash build.sh arm64 "v${{ env.VERSION }}"
+
+      - name: Upload file to release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ env.ACTION_TOKEN }}"
+          automatic_release_tag: "v${{ env.VERSION }}"
+          prerelease: true
+          title: "v${{ env.VERSION }}"
+          files: |
+            deepin-amd64.wsl
+            deepin-arm64.wsl
