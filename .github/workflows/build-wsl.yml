@@ -17,6 +17,7 @@ on:
 
 env:
   ACTION_TOKEN: ${{ secrets.ACTION_TOKEN }}
+  DISTRO_VERSION: 25
 
 jobs:
   build:
@@ -24,9 +25,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v3
-
       - name: Read Rootfs version
         run: |
           echo "VERSION=$(curl -s https://raw.githubusercontent.com/deepin-community/deepin-rootfs/master/version.txt | cat)" >> $GITHUB_ENV
@@ -50,5 +48,5 @@ jobs:
           prerelease: true
           title: "v${{ env.VERSION }}"
           files: |
-            deepin-amd64.wsl
-            deepin-arm64.wsl
+            deepin${{ env.DISTRO_VERSION }}-amd64.wsl
+            deepin${{ env.DISTRO_VERSION }}-arm64.wsl

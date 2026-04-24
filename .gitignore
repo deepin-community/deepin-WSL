@@ -296,3 +296,7 @@ DistroLauncher/messages.h
 *.dll
 *.exe
 *.tar.gz
+
+amd64
+arm64
+*.wsl

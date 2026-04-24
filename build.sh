@@ -7,6 +7,7 @@ VERSION=$2
 
 ROOTFS=deepin-wsl-rootfs-${ARCH}.tar.gz
 ROOTFS_URL=https://github.com/deepin-community/deepin-rootfs/releases/download/${VERSION}/${ROOTFS}
+DISTRO_VERSION=25
 
 curl -OLS $ROOTFS_URL
 
@@ -21,5 +22,5 @@ sudo cp config/terminal-profile.json $ARCH/usr/lib/wsl/
 sudo cp resources/deepin.ico $ARCH/usr/lib/wsl/deepin.ico
 
 pushd $ARCH
-sudo tar --numeric-owner --absolute-names -c  * | gzip --best > ../deepin-$ARCH.wsl
+sudo tar --numeric-owner --absolute-names -c  * | gzip --best > ../deepin$DISTRO_VERSION-$ARCH.wsl
 popd
